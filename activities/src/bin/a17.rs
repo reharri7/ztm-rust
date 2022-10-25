@@ -12,4 +12,11 @@
 //   to uppercase and lowercase
 //   * Try searching for: to_uppercase, to_lowercase
 
-fn main() {}
+fn main() {
+    let string_to_print = "CamelCaseString".to_owned();
+    let lowercase_string = string_to_print.to_lowercase();
+    let uppercase_string = string_to_print.to_uppercase();
+    println!("{:?}", string_to_print);
+    println!("{:?}", lowercase_string);
+    println!("{:?}", uppercase_string);
+}
