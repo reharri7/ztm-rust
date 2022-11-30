@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::io;
 // Project 1: Interactive bill manager
 //
@@ -37,19 +38,22 @@ pub struct Bill {
 }
 
 pub struct Bills {
-    inner: Vec<Bill>,
+    inner: HashMap<String, Bill>,
 }
 
 impl Bills {
     fn new() -> Self {
-        Self { inner: vec![] }
+        Self { inner: HashMap::new(), }
     }
     fn add(&mut self, bill: Bill) {
-        self.inner.push(bill);
+        self.inner.insert(bill.name.to_string(), bill);
     }
 
     fn get_all(&self) -> Vec<&Bill> {
-        self.inner.iter().collect()
+        self.inner.values().collect()
+    }
+    fn remove(&mut self, name: &str) -> bool {
+        self.inner.remove(name).is_some()
     }
 }
 fn get_bill_amount() -> Option<f64> {
@@ -98,6 +102,22 @@ mod menu {
         bills.add(bill);
         println!("Bill added");
     }
+    pub fn remove_bill(bills: &mut Bills) {
+        for bill in bills.get_all() {
+            println!("{}: {}", bill.name, bill.amount);
+        }
+        println!("Which bill would you like to remove?");
+
+        let name = match get_input() {
+            Some(name) => name,
+            None => return,
+        };
+        if bills.remove(&name) {
+            println!("Bill removed");
+        } else {
+            println!("Bill not found");
+        }
+    }
     pub fn view_bills(bills: &Bills) {
         for bill in bills.get_all() {
             println!("{:?}", bill);
@@ -107,12 +127,14 @@ mod menu {
 enum MainMenu {
     AddBill,
     ViewBill,
+    RemoveBill,
 }
 impl MainMenu { 
     fn from_str(input: &str) -> Option<MainMenu> {
         match input {
             "1" => Some(MainMenu::AddBill),
             "2" => Some(MainMenu::ViewBill),
+            "3" => Some(MainMenu::RemoveBill),
             _ => None,
         }
     }
@@ -121,6 +143,7 @@ impl MainMenu {
         println!(" == Bill Manager ==");
         println!("1. Add bill");
         println!("2. View bill");
+        println!("3. Remove bill");
         println!("");
         println!("Enter a number to select an option");
 
@@ -135,6 +158,7 @@ fn main() {
         match MainMenu::from_str(input.as_str()) {
             Some(MainMenu::AddBill) => menu::add_bill(&mut bills),
             Some(MainMenu::ViewBill) => menu::view_bills(&bills),
+            Some(MainMenu::RemoveBill) => menu::remove_bill(&mut bills),
             None => return,
         }
         // Get the user's choice
