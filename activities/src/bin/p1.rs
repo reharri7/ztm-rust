@@ -55,6 +55,15 @@ impl Bills {
     fn remove(&mut self, name: &str) -> bool {
         self.inner.remove(name).is_some()
     }
+    fn update(&mut self, name: &str, amount: f64) -> bool {
+        match self.inner.get_mut(name) {
+            Some(bill) => {
+                bill.amount = amount;
+                true
+            }
+            None => false,
+        }
+    }
 }
 fn get_bill_amount() -> Option<f64> {
     println!("Amount:");
@@ -123,11 +132,32 @@ mod menu {
             println!("{:?}", bill);
         }
     }
+    pub fn update_bill(bills: &mut Bills) {
+        for bill in bills.get_all() {
+            println!("{}: {}", bill.name, bill.amount);
+        }
+
+        println!("Which bill would you like to update?");
+        let name = match get_input() {
+            Some(name) => name,
+            None => return,
+        };
+        let amount = match get_bill_amount() {
+            Some(amount) => amount,
+            None => return,
+        };
+        if bills.update(&name, amount) {
+            println!("Bill updated");
+        } else {
+            println!("Bill not found");
+        }
+    }
 }
 enum MainMenu {
     AddBill,
     ViewBill,
     RemoveBill,
+    UpdateBill,
 }
 impl MainMenu { 
     fn from_str(input: &str) -> Option<MainMenu> {
@@ -135,6 +165,7 @@ impl MainMenu {
             "1" => Some(MainMenu::AddBill),
             "2" => Some(MainMenu::ViewBill),
             "3" => Some(MainMenu::RemoveBill),
+            "4" => Some(MainMenu::UpdateBill),
             _ => None,
         }
     }
@@ -144,24 +175,30 @@ impl MainMenu {
         println!("1. Add bill");
         println!("2. View bill");
         println!("3. Remove bill");
+        println!("4. Update bill");
         println!("");
         println!("Enter a number to select an option");
 
     }
 }
-fn main() {
+
+fn run_program() -> Option<()> {
     // Create bill structure
     let mut bills = Bills::new();
     loop {
         MainMenu::show();
-        let input = get_input().expect("no data entered");
+        let input = get_input()?;
         match MainMenu::from_str(input.as_str()) {
             Some(MainMenu::AddBill) => menu::add_bill(&mut bills),
             Some(MainMenu::ViewBill) => menu::view_bills(&bills),
             Some(MainMenu::RemoveBill) => menu::remove_bill(&mut bills),
-            None => return,
+            Some(MainMenu::UpdateBill) => menu::update_bill(&mut bills),
+            None => break,
         }
-        // Get the user's choice
     }
+    None
+}
+fn main() {
+    run_program();
 }
 
