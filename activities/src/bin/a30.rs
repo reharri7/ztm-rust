@@ -15,7 +15,55 @@
 // * It is not necessary to have data fields or function implementations
 //   for the vehicle bodies/colors
 
-trait Body {}
-trait Color {}
+trait Body {
+    fn get_body(&self) -> String;
+}
+trait Color {
+    fn get_color(&self) -> String;
+}
+#[derive(Debug)]
+struct Vehicle<B: Body, C: Color> {
+    body: B,
+    color: C,
+}
 
-fn main() {}
+impl<B: Body, C: Color> Vehicle<B, C> {
+    pub fn new(body: B, color: C) -> Self {
+        Self { body, color }
+    }
+}
+#[derive(Debug)]
+struct Car;
+impl Body for Car {
+    fn get_body(&self) -> String {
+        "Car".to_string()
+    }
+}
+#[derive(Debug)]
+struct Truck;
+impl Body for Truck {
+    fn get_body(&self) -> String {
+        "Truck".to_string()
+    }
+}
+#[derive(Debug)]
+struct Red;
+impl Color for Red {
+    fn get_color(&self) -> String {
+        "Red".to_string()
+    }
+}
+#[derive(Debug)]
+struct Blue;
+impl Color for Blue {
+    fn get_color(&self) -> String {
+        "Blue".to_string()
+    }
+}
+
+fn main() {
+    let red_truck = Vehicle::new(Truck, Red);
+    let blue_car = Vehicle::new(Car, Blue);
+    println!("{:?}", red_truck);
+    println!("{:?}", blue_car);
+}
