@@ -11,10 +11,22 @@
 // * See the stdlib docs for the "chunks" method on "slice" for more info
 
 fn data() -> &'static [u64] {
-    &[5, 5, 4, 4, 3, 3, 1]
+    &[5, 5, 4, 4, 3, 3, 1, 1]
+}
+
+fn process_chunk(data: &[u64]) {
+    match data {
+        [a, b] => println!("{} + {} = {}", a, b, a + b),
+        [a] => println!("Unpaired value: {}", a),
+        [] => println!("Data stream complete"),
+        [..] => unreachable!("Chunks should always be of size at most 2"),
+    }
 }
 
 fn main() {
     // `stream` is an iterator of Option<&[u64]>
     let mut stream = data().chunks(2);
+    for chunk in stream {
+        process_chunk(chunk);
+    }
 }
